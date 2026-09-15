@@ -42,17 +42,17 @@ public class SoilData {
     private Field field;
 
     // Macro-nutrients (Primary)
-    @Column(name = "nitrogen_level", nullable = false)
+    @Column(name = "nitrogen_level")
     private Double nitrogenLevel;
 
-    @Column(name = "phosphorus_level", nullable = false)
+    @Column(name = "phosphorus_level")
     private Double phosphorusLevel;
 
-    @Column(name = "potassium_level", nullable = false)
+    @Column(name = "potassium_level")
     private Double potassiumLevel;
 
     // Physical / Chemical Parameters
-    @Column(name = "ph_level", nullable = false)
+    @Column(name = "ph_level")
     private Double phLevel;
 
     @Column(name = "electrical_conductivity")
@@ -85,7 +85,7 @@ public class SoilData {
     private Double boronLevel;
 
     // Soil test date
-    @Column(name = "tested_date", nullable = false)
+    @Column(name = "tested_date")
     private LocalDate testedDate;
 
     // Image & source metadata

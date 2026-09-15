@@ -27,7 +27,7 @@ public class CropRecommendationController {
     private final CropRecommendationService cropRecommendationService;
 
     @GetMapping("/api/fields/{fieldId}/recommendations")
-    @PreAuthorize("hasRole('ADMIN') or @securityService.isFieldOwner(#fieldId)")
+    @PreAuthorize("hasRole('FARMER') or @securityService.isFieldOwner(#fieldId)")
     @Operation(summary = "Get all crop recommendations for a specific field with pagination and sorting (Admin or field owner)")
     public ResponseEntity<Page<CropRecommendationResponseDto>> getRecommendationsByFieldId(
             @PathVariable Long fieldId,

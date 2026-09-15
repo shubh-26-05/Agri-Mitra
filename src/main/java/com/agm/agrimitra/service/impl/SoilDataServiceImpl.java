@@ -10,10 +10,12 @@ import com.agm.agrimitra.repository.FieldRepository;
 import com.agm.agrimitra.repository.SoilDataRepository;
 import com.agm.agrimitra.service.SoilDataService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -36,15 +38,23 @@ public class SoilDataServiceImpl implements SoilDataService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<SoilDataResponseDto> getSoilDataByFieldId(Long fieldId) {
+    public Page<SoilDataResponseDto> getSoilDataByFieldId(Long fieldId, Pageable pageable) {
         if (!fieldRepository.existsById(fieldId)) {
             throw new ResourceNotFoundException("Field", "id", fieldId);
         }
 
-        return soilDataRepository.findByFieldIdOrderByTestedDateDesc(fieldId)
-                .stream()
-                .map(soilDataMapper::toResponseDto)
-                .toList();
+        return soilDataRepository.findByFieldId(fieldId, pageable)
+                .map(soilDataMapper::toResponseDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<SoilDataResponseDto> getSoilDataByFieldId(Long fieldId, int page, int size, String sortBy, String sortDir) {
+        int cappedSize = Math.min(Math.max(size, 1), 100);
+        Sort.Direction direction = "asc".equalsIgnoreCase(sortDir) ? Sort.Direction.ASC : Sort.Direction.DESC;
+        String sortField = (sortBy != null && !sortBy.isBlank()) ? sortBy : "testedDate";
+        Pageable pageable = PageRequest.of(Math.max(page, 0), cappedSize, Sort.by(direction, sortField));
+        return getSoilDataByFieldId(fieldId, pageable);
     }
 
     @Override

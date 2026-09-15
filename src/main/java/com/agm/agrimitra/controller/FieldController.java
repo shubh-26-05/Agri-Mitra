@@ -8,6 +8,10 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,9 +21,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,9 +44,19 @@ public class FieldController {
 
     @GetMapping("/api/farmers/{farmerId}/fields")
     @PreAuthorize("hasRole('ADMIN') or @securityService.isFarmer(#farmerId)")
-    @Operation(summary = "Get all fields belonging to a specific farmer (Admin or farmer owner)")
-    public ResponseEntity<List<FieldResponseDto>> getFieldsByFarmerId(@PathVariable Long farmerId) {
-        List<FieldResponseDto> fields = fieldService.getFieldsByFarmerId(farmerId);
+    @Operation(summary = "Get all fields belonging to a specific farmer with pagination and sorting (Admin or farmer owner)")
+    public ResponseEntity<Page<FieldResponseDto>> getFieldsByFarmerId(
+            @PathVariable Long farmerId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir) {
+
+        int cappedSize = Math.min(Math.max(size, 1), 100);
+        Sort.Direction direction = "desc".equalsIgnoreCase(sortDir) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(Math.max(page, 0), cappedSize, Sort.by(direction, sortBy));
+
+        Page<FieldResponseDto> fields = fieldService.getFieldsByFarmerId(farmerId, pageable);
         return ResponseEntity.ok(fields);
     }
 

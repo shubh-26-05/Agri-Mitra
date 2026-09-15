@@ -8,6 +8,10 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,9 +20,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,9 +43,20 @@ public class SoilDataController {
 
     @GetMapping("/api/fields/{fieldId}/soil-data")
     @PreAuthorize("hasRole('ADMIN') or @securityService.isFieldOwner(#fieldId)")
-    @Operation(summary = "Get all soil data records for a specific field (Admin or field owner)")
-    public ResponseEntity<List<SoilDataResponseDto>> getSoilDataByFieldId(@PathVariable Long fieldId) {
-        List<SoilDataResponseDto> soilDataList = soilDataService.getSoilDataByFieldId(fieldId);
+    @Operation(summary = "Get all soil data records for a specific field with pagination and sorting (Admin or field owner)")
+    public ResponseEntity<Page<SoilDataResponseDto>> getSoilDataByFieldId(
+            @PathVariable Long fieldId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "testedDate") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir) {
+
+        int cappedSize = Math.min(Math.max(size, 1), 100);
+        Sort.Direction direction = "asc".equalsIgnoreCase(sortDir) ? Sort.Direction.ASC : Sort.Direction.DESC;
+        String sortField = (sortBy != null && !sortBy.isBlank()) ? sortBy : "testedDate";
+        Pageable pageable = PageRequest.of(Math.max(page, 0), cappedSize, Sort.by(direction, sortField));
+
+        Page<SoilDataResponseDto> soilDataList = soilDataService.getSoilDataByFieldId(fieldId, pageable);
         return ResponseEntity.ok(soilDataList);
     }
 

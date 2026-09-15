@@ -2,14 +2,16 @@ package com.agm.agrimitra.service;
 
 import com.agm.agrimitra.dto.FarmerRequestDto;
 import com.agm.agrimitra.dto.FarmerResponseDto;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface FarmerService {
 
     FarmerResponseDto createFarmer(FarmerRequestDto requestDto);
 
-    List<FarmerResponseDto> getAllFarmers();
+    Page<FarmerResponseDto> getAllFarmers(Pageable pageable);
+
+    Page<FarmerResponseDto> getAllFarmers(int page, int size, String sortBy, String sortDir);
 
     FarmerResponseDto getFarmerById(Long id);
 

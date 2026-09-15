@@ -1,5 +1,6 @@
 package com.agm.agrimitra.dto;
 
+import com.agm.agrimitra.entity.SoilDataSource;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -32,9 +33,37 @@ public class SoilDataRequestDto {
     @Positive(message = "pH level must be greater than zero")
     private Double phLevel;
 
+    @PositiveOrZero(message = "Electrical conductivity must be non-negative")
+    private Double electricalConductivity;
+
+    @PositiveOrZero(message = "Organic carbon must be non-negative")
+    private Double organicCarbon;
+
     @PositiveOrZero(message = "Moisture level must be non-negative")
     private Double moistureLevel;
 
+    @PositiveOrZero(message = "Sulphur level must be non-negative")
+    private Double sulphurLevel;
+
+    @PositiveOrZero(message = "Zinc level must be non-negative")
+    private Double zincLevel;
+
+    @PositiveOrZero(message = "Iron level must be non-negative")
+    private Double ironLevel;
+
+    @PositiveOrZero(message = "Copper level must be non-negative")
+    private Double copperLevel;
+
+    @PositiveOrZero(message = "Manganese level must be non-negative")
+    private Double manganeseLevel;
+
+    @PositiveOrZero(message = "Boron level must be non-negative")
+    private Double boronLevel;
+
     @NotNull(message = "Tested date is required")
     private LocalDate testedDate;
+
+    private String imageUrl;
+
+    private SoilDataSource dataSource;
 }

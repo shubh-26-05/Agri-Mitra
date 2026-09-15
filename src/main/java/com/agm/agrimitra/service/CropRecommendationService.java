@@ -1,12 +1,14 @@
 package com.agm.agrimitra.service;
 
 import com.agm.agrimitra.dto.CropRecommendationResponseDto;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface CropRecommendationService {
 
-    List<CropRecommendationResponseDto> getRecommendationsByFieldId(Long fieldId);
+    Page<CropRecommendationResponseDto> getRecommendationsByFieldId(Long fieldId, Pageable pageable);
+
+    Page<CropRecommendationResponseDto> getRecommendationsByFieldId(Long fieldId, int page, int size, String sortBy, String sortDir);
 
     CropRecommendationResponseDto getRecommendationById(Long id);
 

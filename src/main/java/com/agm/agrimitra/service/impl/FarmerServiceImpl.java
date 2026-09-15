@@ -11,10 +11,12 @@ import com.agm.agrimitra.repository.UserRepository;
 import com.agm.agrimitra.security.SecurityService;
 import com.agm.agrimitra.service.FarmerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -51,11 +53,18 @@ public class FarmerServiceImpl implements FarmerService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<FarmerResponseDto> getAllFarmers() {
-        return farmerRepository.findAll()
-                .stream()
-                .map(farmerMapper::toResponseDto)
-                .toList();
+    public Page<FarmerResponseDto> getAllFarmers(Pageable pageable) {
+        return farmerRepository.findAll(pageable)
+                .map(farmerMapper::toResponseDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<FarmerResponseDto> getAllFarmers(int page, int size, String sortBy, String sortDir) {
+        int cappedSize = Math.min(Math.max(size, 1), 100);
+        Sort.Direction direction = "desc".equalsIgnoreCase(sortDir) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(Math.max(page, 0), cappedSize, Sort.by(direction, sortBy));
+        return getAllFarmers(pageable);
     }
 
     @Override

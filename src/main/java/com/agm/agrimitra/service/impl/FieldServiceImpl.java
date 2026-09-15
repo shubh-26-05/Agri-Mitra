@@ -10,10 +10,12 @@ import com.agm.agrimitra.repository.FarmerRepository;
 import com.agm.agrimitra.repository.FieldRepository;
 import com.agm.agrimitra.service.FieldService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -36,15 +38,22 @@ public class FieldServiceImpl implements FieldService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<FieldResponseDto> getFieldsByFarmerId(Long farmerId) {
+    public Page<FieldResponseDto> getFieldsByFarmerId(Long farmerId, Pageable pageable) {
         if (!farmerRepository.existsById(farmerId)) {
             throw new ResourceNotFoundException("Farmer", "id", farmerId);
         }
 
-        return fieldRepository.findByFarmerId(farmerId)
-                .stream()
-                .map(fieldMapper::toResponseDto)
-                .toList();
+        return fieldRepository.findByFarmerId(farmerId, pageable)
+                .map(fieldMapper::toResponseDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<FieldResponseDto> getFieldsByFarmerId(Long farmerId, int page, int size, String sortBy, String sortDir) {
+        int cappedSize = Math.min(Math.max(size, 1), 100);
+        Sort.Direction direction = "desc".equalsIgnoreCase(sortDir) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(Math.max(page, 0), cappedSize, Sort.by(direction, sortBy));
+        return getFieldsByFarmerId(farmerId, pageable);
     }
 
     @Override

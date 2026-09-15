@@ -3,9 +3,11 @@ package com.agm.agrimitra.controller;
 import com.agm.agrimitra.dto.CropRecommendationResponseDto;
 import com.agm.agrimitra.service.CropRecommendationService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,12 +18,14 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Crop Recommendation Controller", description = "Endpoints for retrieving and deleting crop recommendations")
+@SecurityRequirement(name = "bearerAuth")
 public class CropRecommendationController {
 
     private final CropRecommendationService cropRecommendationService;
 
     @GetMapping("/api/fields/{fieldId}/recommendations")
-    @Operation(summary = "Get all crop recommendations for a specific field")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.isFieldOwner(#fieldId)")
+    @Operation(summary = "Get all crop recommendations for a specific field (Admin or field owner)")
     public ResponseEntity<List<CropRecommendationResponseDto>> getRecommendationsByFieldId(
             @PathVariable Long fieldId) {
         List<CropRecommendationResponseDto> recommendations =
@@ -30,7 +34,8 @@ public class CropRecommendationController {
     }
 
     @GetMapping("/api/recommendations/{id}")
-    @Operation(summary = "Get crop recommendation by ID")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.isRecommendationOwner(#id)")
+    @Operation(summary = "Get crop recommendation by ID (Admin or field owner)")
     public ResponseEntity<CropRecommendationResponseDto> getRecommendationById(@PathVariable Long id) {
         CropRecommendationResponseDto recommendation =
                 cropRecommendationService.getRecommendationById(id);
@@ -38,7 +43,8 @@ public class CropRecommendationController {
     }
 
     @DeleteMapping("/api/recommendations/{id}")
-    @Operation(summary = "Delete crop recommendation by ID")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.isRecommendationOwner(#id)")
+    @Operation(summary = "Delete crop recommendation by ID (Admin or field owner)")
     public ResponseEntity<Void> deleteRecommendation(@PathVariable Long id) {
         cropRecommendationService.deleteRecommendation(id);
         return ResponseEntity.noContent().build();

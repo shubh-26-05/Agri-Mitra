@@ -5,12 +5,13 @@ import com.agm.agrimitra.dto.FarmerRequestDto;
 import com.agm.agrimitra.dto.FarmerResponseDto;
 import com.agm.agrimitra.entity.Address;
 import com.agm.agrimitra.entity.Farmer;
+import com.agm.agrimitra.entity.User;
 import org.springframework.stereotype.Component;
 
 @Component
 public class FarmerMapper {
 
-    public Farmer toEntity(FarmerRequestDto dto) {
+    public Farmer toEntity(FarmerRequestDto dto, User user) {
         if (dto == null) {
             return null;
         }
@@ -25,11 +26,16 @@ public class FarmerMapper {
         }
 
         return Farmer.builder()
+                .user(user)
                 .name(dto.getName())
                 .phoneNumber(dto.getPhoneNumber())
                 .email(dto.getEmail())
                 .location(address)
                 .build();
+    }
+
+    public Farmer toEntity(FarmerRequestDto dto) {
+        return toEntity(dto, null);
     }
 
     public FarmerResponseDto toResponseDto(Farmer entity) {
@@ -46,8 +52,11 @@ public class FarmerMapper {
                     .build();
         }
 
+        Long userId = entity.getUser() != null ? entity.getUser().getId() : null;
+
         return FarmerResponseDto.builder()
                 .id(entity.getId())
+                .userId(userId)
                 .name(entity.getName())
                 .phoneNumber(entity.getPhoneNumber())
                 .email(entity.getEmail())

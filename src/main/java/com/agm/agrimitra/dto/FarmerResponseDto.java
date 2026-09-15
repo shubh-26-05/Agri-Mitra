@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 public class FarmerResponseDto {
 
     private Long id;
+    private Long userId;
     private String name;
     private String phoneNumber;
     private String email;

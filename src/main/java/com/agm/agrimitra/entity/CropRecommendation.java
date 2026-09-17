@@ -44,6 +44,12 @@ public class CropRecommendation {
     @Column(name = "confidence_score")
     private Double confidenceScore;
 
+    @Column(name = "reasoning", columnDefinition = "TEXT")
+    private String reasoning;
+
+    @Column(name = "fertilizer_advice", columnDefinition = "TEXT")
+    private String fertilizerAdvice;
+
     @Column(name = "recommendation_date", nullable = false)
     private LocalDateTime recommendationDate;
 

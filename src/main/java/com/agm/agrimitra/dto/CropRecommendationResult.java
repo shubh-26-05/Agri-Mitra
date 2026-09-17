@@ -5,23 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CropRecommendationResponseDto {
+public class CropRecommendationResult {
 
-    private Long id;
-    private Long fieldId;
-    private Long soilDataId;
     private String recommendedCrop;
     private Double confidenceScore;
     private String reasoning;
     private String fertilizerAdvice;
-    private LocalDateTime recommendationDate;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private String dataFreshnessWarning;
 }

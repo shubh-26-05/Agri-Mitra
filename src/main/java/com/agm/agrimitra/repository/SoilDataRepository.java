@@ -11,6 +11,8 @@ import java.util.List;
 @Repository
 public interface SoilDataRepository extends JpaRepository<SoilData, Long> {
 
+    List<SoilData> findByFieldId(Long fieldId);
+
     List<SoilData> findByFieldIdOrderByTestedDateDesc(Long fieldId);
 
     Page<SoilData> findByFieldId(Long fieldId, Pageable pageable);

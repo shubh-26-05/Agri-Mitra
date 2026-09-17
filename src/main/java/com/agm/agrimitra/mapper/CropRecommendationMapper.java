@@ -21,6 +21,8 @@ public class CropRecommendationMapper {
                 .soilDataId(soilDataId)
                 .recommendedCrop(entity.getRecommendedCrop())
                 .confidenceScore(entity.getConfidenceScore())
+                .reasoning(entity.getReasoning())
+                .fertilizerAdvice(entity.getFertilizerAdvice())
                 .recommendationDate(entity.getRecommendationDate())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())

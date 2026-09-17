@@ -1,6 +1,7 @@
 package com.agm.agrimitra.controller;
 
 import com.agm.agrimitra.dto.CropRecommendationResponseDto;
+import com.agm.agrimitra.entity.User;
 import com.agm.agrimitra.service.CropRecommendationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -12,22 +13,37 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "Crop Recommendation Controller", description = "Endpoints for retrieving and deleting crop recommendations")
+@Tag(name = "Crop Recommendation Controller", description = "Endpoints for generating, retrieving, and deleting crop recommendations")
 @SecurityRequirement(name = "bearerAuth")
 public class CropRecommendationController {
 
     private final CropRecommendationService cropRecommendationService;
 
+    @PostMapping("/api/fields/{fieldId}/recommendations")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.isFieldOwner(#fieldId)")
+    @Operation(summary = "Generate and save a new crop recommendation for a field (Admin or field owner)")
+    public ResponseEntity<CropRecommendationResponseDto> generateRecommendation(
+            @PathVariable Long fieldId,
+            @AuthenticationPrincipal User currentUser) {
+
+        Long authenticatedUserId = currentUser != null ? currentUser.getId() : null;
+        CropRecommendationResponseDto recommendation =
+                cropRecommendationService.generateCropRecommendationForField(fieldId, authenticatedUserId);
+        return ResponseEntity.ok(recommendation);
+    }
+
     @GetMapping("/api/fields/{fieldId}/recommendations")
-    @PreAuthorize("hasRole('FARMER') or @securityService.isFieldOwner(#fieldId)")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.isFieldOwner(#fieldId)")
     @Operation(summary = "Get all crop recommendations for a specific field with pagination and sorting (Admin or field owner)")
     public ResponseEntity<Page<CropRecommendationResponseDto>> getRecommendationsByFieldId(
             @PathVariable Long fieldId,

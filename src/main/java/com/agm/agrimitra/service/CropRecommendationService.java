@@ -13,4 +13,8 @@ public interface CropRecommendationService {
     CropRecommendationResponseDto getRecommendationById(Long id);
 
     void deleteRecommendation(Long id);
+
+    CropRecommendationResponseDto generateCropRecommendationForField(Long fieldId, Long authenticatedUserId);
+
+    CropRecommendationResponseDto generateCropRecommendationForField(Long fieldId);
 }

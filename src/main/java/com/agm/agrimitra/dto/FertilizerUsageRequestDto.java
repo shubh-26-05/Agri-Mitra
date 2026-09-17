@@ -2,6 +2,7 @@ package com.agm.agrimitra.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,5 +28,6 @@ public class FertilizerUsageRequestDto {
     private String quantityUnit;
 
     @NotNull(message = "Application date is required")
+    @PastOrPresent(message = "Application date cannot be in the future")
     private LocalDate applicationDate;
 }
